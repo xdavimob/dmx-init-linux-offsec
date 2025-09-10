@@ -116,6 +116,12 @@ alias john="~/Tools/john-jumbo/run/john"
 alias jwt_tool='python3 ~/Tools/jwt_tool/jwt_tool.py'
 alias myip="curl ifconfig.me;echo"
 alias lip="ip a | grep -E '([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{ print $2 }' | grep -v 127.0.0.1"
+alias apps="adb shell pm list packages | cut -f2 -d: | sort"
+alias prop="adb shell getprop ro.product.cpu.abi"
+alias root="adb root"
+alias unroot="adb unroot"
+alias fridaps="frida-ps -U -a"
+#alias server="adb shell /data/local/tmp/frida-server &"
 
 # Funções
 function jwt-decode() {
