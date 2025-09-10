@@ -122,11 +122,87 @@ function jwt-decode() {
   sed 's/\./\n/g' <<< $(cut -d. -f1,2 <<< $1) | base64 --decode | jq
 }
 function signer() {
-    if [ -z "$1" ]; then
-        echo "Uso: signer <apk>"
+    if [ $# -lt 1 ]; then
+        echo "Uso: signer <apk_ou_pasta> [<apk_ou_pasta> ...]"
+        echo "Ex.:  signer app.apk"
+        echo "      signer ./dir_com_apks base.apk split_pt.apk"
         return 1
     fi
-    java -jar ~/Mobile/uber-apk-signer-1.3.0.jar --apks "$1" --overwrite
+
+    local JAR="$HOME/Mobile/uber-apk-signer-1.3.0.jar"
+    if [ ! -f "$JAR" ]; then
+        echo "[!] JAR não encontrado em: $JAR"
+        echo "    Ajuste a variável JAR no script."
+        return 1
+    fi
+    command -v java >/dev/null || { echo "[!] Java não encontrado no PATH."; return 1; }
+
+    # Coleta e valida entradas existentes
+    local inputs=()
+    local had_missing=0
+    for arg in "$@"; do
+        if [ -e "$arg" ]; then
+            inputs+=("$arg")
+        else
+            echo "[!] Caminho não encontrado: $arg"
+            had_missing=1
+        fi
+    done
+    if [ ${#inputs[@]} -eq 0 ]; then
+        echo "[!] Nenhum arquivo/pasta válido fornecido."
+        return 1
+    fi
+    if [ $had_missing -eq 1 ]; then
+        echo "[i] Continuando apenas com entradas existentes."
+    fi
+
+    echo "[*] Assinando com uber-apk-signer..."
+    # --apks aceita lista com arquivos e pastas; não-recursivo para pastas
+    # --allowResign força reassinatura quando já houver assinatura
+    # --overwrite sobrescreve saídas previamente geradas
+    java -jar "$JAR" --allowResign --overwrite --apks "${inputs[@]}"
+    local rc=$?
+
+    if [ $rc -ne 0 ]; then
+        echo "[!] Falha ao assinar. (exit=$rc)"
+        return $rc
+    fi
+
+    echo "[+] Processo concluído pelo uber-apk-signer."
+
+    # Dicas de instalação:
+    #  - Saídas típicas: <nome>-aligned-debugSigned.apk (ou similar)
+    #  - Para conjuntos (base + splits), use install-multiple.
+    local printed_multi_hint=0
+    for arg in "${inputs[@]}"; do
+        if [ -f "$arg" ]; then
+            # Tenta inferir o nome do APK de saída
+            local base="${arg%.*}"
+            # Padrões comuns de saída do uber-apk-signer:
+            #   *-aligned-debugSigned.apk  ou  *-aligned-signed.apk
+            local out1="${base}-aligned-debugSigned.apk"
+            local out2="${base}-aligned-signed.apk"
+            if [ -f "$out1" ]; then
+                echo "[i] Saída: $out1"
+                echo "    Para instalar: adb install -r \"$out1\""
+            elif [ -f "$out2" ]; then
+                echo "[i] Saída: $out2"
+                echo "    Para instalar: adb install -r \"$out2\""
+            else
+                echo "[i] Verifique o arquivo de saída gerado na mesma pasta de: $arg"
+            fi
+        else
+            # Pasta: sugere install-multiple com glob
+            if [ $printed_multi_hint -eq 0 ]; then
+                echo
+                echo "[i] Para instalar conjunto (base + splits) já assinados desta(s) pasta(s):"
+                printed_multi_hint=1
+            fi
+            echo "    adb install-multiple -r \"$arg\"/*-Signed.apk"
+        fi
+    done
+
+    return 0
 }
 function apkpull() {
     [[ -z "$1" ]] && { echo "Usage: apkpull <package>"; return 1; }
