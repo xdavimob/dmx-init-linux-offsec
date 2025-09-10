@@ -61,9 +61,9 @@ go install github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
 
 echo "[*] Instalando via pipx..."
 pipx ensurepath
-pipx install frida-tools
+pipx install "frida-tools<14"
 pipx install mitmproxy
-pipx install objection
+pipx runpip objection install --force-reinstall "frida==16.7.19"
 pipx install git-dumper
 
 echo "[*] Clonando ferramentas..."
