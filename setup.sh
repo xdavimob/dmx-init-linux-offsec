@@ -58,6 +58,11 @@ echo "[*] Instalando pacotes via go..."
 go install github.com/projectdiscovery/httpx/cmd/httpx@latest
 go install github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
 go install github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+go install github.com/projectdiscovery/dnsx/cmd/dnsx@lates
+go install github.com/tomnomnom/assetfinder@latest
+go install -v github.com/owasp-amass/amass/v4/...@master
+
+sudo gem install wpscan
 
 echo "[*] Instalando via pipx..."
 pipx ensurepath
