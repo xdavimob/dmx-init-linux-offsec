@@ -129,6 +129,8 @@ alias fridaps="frida-ps -U -a"
 #alias server="adb shell /data/local/tmp/frida-server &"
 
 # Funções
+function proxy_on()  { adb shell settings put global http_proxy "$1";  echo "http_proxy=$1"; }
+function proxy_off() { adb shell settings put global http_proxy :0;    echo "http_proxy off"; }
 function jwt-decode() {
   sed 's/\./\n/g' <<< $(cut -d. -f1,2 <<< $1) | base64 --decode | jq
 }
