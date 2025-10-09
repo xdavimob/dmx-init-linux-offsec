@@ -145,12 +145,18 @@ pipx install pwncat-cs
 pipx install certipy-ad
 
 echo "[*] Clonando ferramentas..."
-gclone https://github.com/openwall/john -b ~/Tools/john-jumbo
-gclone https://github.com/sqlmapproject/sqlmap ~/Tools/sqlmap
-gclone https://github.com/danielmiessler/SecLists.git /usr/share/wordlists/SecLists sudo
-gclone https://github.com/ticarpi/jwt_tool.git ~/Tools/jwt_tool
-gclone https://github.com/internetwache/GitTools.git ~/Tools/GitTools
-gclone https://github.com/cddmp/enum4linux-ng ~/Tools/enum4linux-ng
+if [ ! -d "$HOME/Tools/john-jumbo/.git" ]; then
+  git clone --depth 1 -b bleeding-jumbo https://github.com/openwall/john "$HOME/Tools/john-jumbo"
+else
+  git -C "$HOME/Tools/john-jumbo" fetch --all --tags
+  git -C "$HOME/Tools/john-jumbo" checkout bleeding-jumbo
+  git -C "$HOME/Tools/john-jumbo" pull --ff-only
+fi
+git clone https://github.com/sqlmapproject/sqlmap ~/Tools/sqlmap
+git clone https://github.com/danielmiessler/SecLists.git /usr/share/wordlists/SecLists sudo
+git clone https://github.com/ticarpi/jwt_tool.git ~/Tools/jwt_tool
+git clone https://github.com/internetwache/GitTools.git ~/Tools/GitTools
+git clone https://github.com/cddmp/enum4linux-ng ~/Tools/enum4linux-ng
 
 echo "[*] Compilando John the Ripper..."
 cd ~/Tools/john-jumbo/src
