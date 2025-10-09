@@ -417,29 +417,33 @@ wget https://github.com/jakobfriedl/precompiled-binaries/raw/main/Scripts/PowerU
 wget https://github.com/jakobfriedl/precompiled-binaries/raw/main/Scripts/PowerView.ps1
 
 # ----------- Rubeus -----------
-wget https://github.com/jakobfriedl/precompiled-binaries/raw/main/LateralMovement/Rubeus.exe
+[ -s Rubeus.exe ] || wget -q "https://github.com/jakobfriedl/precompiled-binaries/raw/main/LateralMovement/Rubeus.exe" -O Rubeus.exe
 
 # ----------- LIGOLO-NG (Linux + Windows) -----------
-wget -q https://github.com/nicocha30/ligolo-ng/releases/download/v0.8.2/ligolo-ng_agent_0.8.2_windows_amd64.zip
-wget -q https://github.com/nicocha30/ligolo-ng/releases/download/v0.8.2/ligolo-ng_agent_0.8.2_linux_amd64.tar.gz
-wget -q https://github.com/nicocha30/ligolo-ng/releases/download/v0.8.2/ligolo-ng_proxy_0.8.2_linux_amd64.tar.gz
-wget -q https://github.com/nicocha30/ligolo-ng/releases/download/v0.8.2/ligolo-ng_proxy_0.8.2_windows_amd64.zip
+[ -s ligolo-ng_agent_0.8.2_windows_amd64.zip ] || wget -q https://github.com/nicocha30/ligolo-ng/releases/download/v0.8.2/ligolo-ng_agent_0.8.2_windows_amd64.zip
+[ -s ligolo-ng_agent_0.8.2_linux_amd64.tar.gz ] || wget -q https://github.com/nicocha30/ligolo-ng/releases/download/v0.8.2/ligolo-ng_agent_0.8.2_linux_amd64.tar.gz
+[ -s ligolo-ng_proxy_0.8.2_linux_amd64.tar.gz ] || wget -q https://github.com/nicocha30/ligolo-ng/releases/download/v0.8.2/ligolo-ng_proxy_0.8.2_linux_amd64.tar.gz
+[ -s ligolo-ng_proxy_0.8.2_windows_amd64.zip ] || wget -q https://github.com/nicocha30/ligolo-ng/releases/download/v0.8.2/ligolo-ng_proxy_0.8.2_windows_amd64.zip
 
 mkdir -p ligolo-ng && cd ligolo-ng
 tar -xzf ../ligolo-ng_agent_0.8.2_linux_amd64.tar.gz
 tar -xzf ../ligolo-ng_proxy_0.8.2_linux_amd64.tar.gz
-unzip -q ../ligolo-ng_agent_0.8.2_windows_amd64.zip
-unzip -q ../ligolo-ng_proxy_0.8.2_windows_amd64.zip
-rm ../ligolo-ng_*.zip ../ligolo-ng_*.tar.gz
+unzip -oq ../ligolo-ng_agent_0.8.2_windows_amd64.zip      # -o = overwrite sem perguntar, -q = quiet
+unzip -oq ../ligolo-ng_proxy_0.8.2_windows_amd64.zip
+rm -f ../ligolo-ng_*.zip ../ligolo-ng_*.tar.gz
 cd ..
 
 # ----------- BLOODHOUND LAB (Community Edition) -----------
 if ! command -v bloodhound-cli >/dev/null 2>&1; then
-  wget -q https://github.com/SpecterOps/bloodhound-cli/releases/latest/download/bloodhound-cli-linux-amd64.tar.gz -O /tmp/bh.tar.gz
-  tar -xzf /tmp/bh.tar.gz -C "$HOME/Tools"    # extrai "bloodhound-cli"
-  chmod +x "$HOME/Tools/bloodhound-cli"
-  "$HOME/Tools/bloodhound-cli" install
-  rm -f /tmp/bh.tar.gz
+  if systemctl is-active --quiet docker; then
+    wget -q https://github.com/SpecterOps/bloodhound-cli/releases/latest/download/bloodhound-cli-linux-amd64.tar.gz -O /tmp/bh.tar.gz
+    tar -xzf /tmp/bh.tar.gz -C "$HOME/Tools"
+    chmod +x "$HOME/Tools/bloodhound-cli"
+    "$HOME/Tools/bloodhound-cli" install
+    rm -f /tmp/bh.tar.gz
+  else
+    echo "[!] Docker instalado porém **não rodando**; pulando bloodhound-cli agora. (inicie Docker e rode este bloco depois)"
+  fi
 else
   echo "[*] bloodhound-cli já presente, pulando."
 fi
