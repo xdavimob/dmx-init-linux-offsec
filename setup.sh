@@ -58,9 +58,15 @@ echo "[*] Instalando pacotes via go..."
 go install github.com/projectdiscovery/httpx/cmd/httpx@latest
 go install github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
 go install github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
-go install github.com/projectdiscovery/dnsx/cmd/dnsx@lates
+
 go install github.com/tomnomnom/assetfinder@latest
 go install -v github.com/owasp-amass/amass/v4/...@master
+
+git clone https://github.com/blechschmidt/massdns.git
+cd massdns
+make
+sudo make install
+go install github.com/d3mondev/puredns/v2@latest
 
 sudo gem install wpscan
 
