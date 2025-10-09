@@ -165,11 +165,11 @@ else
   git -C "$HOME/Tools/john-jumbo" checkout bleeding-jumbo
   git -C "$HOME/Tools/john-jumbo" pull --ff-only
 fi
-git clone https://github.com/sqlmapproject/sqlmap ~/Tools/sqlmap
-git clone https://github.com/danielmiessler/SecLists.git /usr/share/wordlists/SecLists sudo
-git clone https://github.com/ticarpi/jwt_tool.git ~/Tools/jwt_tool
-git clone https://github.com/internetwache/GitTools.git ~/Tools/GitTools
-git clone https://github.com/cddmp/enum4linux-ng ~/Tools/enum4linux-ng
+git_sync "https://github.com/sqlmapproject/sqlmap"          "$HOME/Tools/sqlmap"
+git_sync "https://github.com/danielmiessler/SecLists.git"  "/usr/share/wordlists/SecLists" "sudo"
+git_sync "https://github.com/ticarpi/jwt_tool.git"         "$HOME/Tools/jwt_tool"
+git_sync "https://github.com/internetwache/GitTools.git"  "$HOME/Tools/GitTools"
+git_sync "https://github.com/cddmp/enum4linux-ng"         "$HOME/Tools/enum4linux-ng"
 
 echo "[*] Compilando John the Ripper..."
 cd ~/Tools/john-jumbo/src
