@@ -9,7 +9,9 @@ Ideal for preparing WSL, Kali Linux, or Ubuntu environments focused on pentestin
 ## Quick Installation
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/xdavimob/dmx-init-linux-offsec/main/setup.sh | bash
+wget https://raw.githubusercontent.com/xdavimob/dmx-init-linux-offsec/main/setup.sh
+chmod +x https://raw.githubusercontent.com/xdavimob/dmx-init-linux-offsec/main/setup.sh
+./setup.sh
 ````
 
 ---
