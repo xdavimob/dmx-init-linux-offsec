@@ -62,11 +62,31 @@ go install github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
 go install github.com/tomnomnom/assetfinder@latest
 go install -v github.com/owasp-amass/amass/v4/...@master
 
-git clone https://github.com/blechschmidt/massdns.git
-cd massdns
-make
-sudo make install
-go install github.com/d3mondev/puredns/v2@latest
+# massdns + puredns (idempotente)
+if ! command -v massdns >/dev/null 2>&1; then
+  echo "[*] Instalando massdns..."
+  if command -v apt-get >/dev/null 2>&1; then
+    sudo apt-get update -y && sudo apt-get install -y build-essential git libldns-dev
+  fi
+  git -C ~/Tools/massdns pull --ff-only 2>/dev/null || {
+    rm -rf ~/Tools/massdns
+    git clone --depth 1 https://github.com/blechschmidt/massdns.git ~/Tools/massdns
+  }
+  make -C ~/Tools/massdns -j"$(nproc)"
+  sudo make -C ~/Tools/massdns install
+else
+  echo "[*] massdns já presente: $(command -v massdns)"
+fi
+
+if ! command -v puredns >/dev/null 2>&1; then
+  echo "[*] Instalando puredns..."
+  go install github.com/d3mondev/puredns/v2@latest
+  GOBIN="$(go env GOBIN)"; GOPATH_BIN="$(go env GOPATH)/bin"
+  BIN="${GOBIN:-$GOPATH_BIN}/puredns"
+  [ -x "$BIN" ] && sudo ln -sf "$BIN" /usr/local/bin/puredns || true
+else
+  echo "[*] puredns já presente: $(command -v puredns)"
+fi
 
 sudo gem install wpscan
 
