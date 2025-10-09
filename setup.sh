@@ -7,6 +7,20 @@
 set -e  # Parar em erros
 set -u  # Erro em variáveis indefinidas
 
+gclone() { # gclone <url> <dest> [sudo]
+  local url="$1" dest="$2" sud=""
+  [ "${3:-}" = "sudo" ] && sud="sudo "
+  if [ -d "$dest/.git" ]; then
+    ${sud}git -C "$dest" pull --ff-only || ${sud}git -C "$dest" fetch --all --tags
+  else
+    ${sud}gclone --depth 1 "$url" "$dest"
+  fi
+}
+
+safelink() { # safelink <target> <link>
+  sudo ln -sfn "$1" "$2"
+}
+
 echo "[*] Atualizando sistema..."
 sudo apt update && sudo apt upgrade -y
 
@@ -50,9 +64,9 @@ mkdir -p ~/Tools ~/Mobile ~/CTF ~/go/{bin,src,pkg}
 sudo mkdir -p /usr/share/wordlists
 
 echo "[*] Clonando plugins do ZSH..."
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-git clone https://github.com/zsh-users/zsh-history-substring-search ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-history-substring-search
+gclone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+gclone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+gclone https://github.com/zsh-users/zsh-history-substring-search ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-history-substring-search
 
 echo "[*] Instalando pacotes via go..."
 go install github.com/projectdiscovery/httpx/cmd/httpx@latest
@@ -71,7 +85,7 @@ else
   command -v apt-get >/dev/null 2>&1 && \
     sudo apt-get update -y && sudo apt-get install -y build-essential git libldns-dev
 
-  git clone --depth 1 https://github.com/blechschmidt/massdns.git "$HOME/Tools/massdns"
+  gclone --depth 1 https://github.com/blechschmidt/massdns.git "$HOME/Tools/massdns"
   make -C "$HOME/Tools/massdns" -j"$(nproc)"
   sudo make -C "$HOME/Tools/massdns" install
 fi
@@ -105,12 +119,12 @@ pipx install pwncat-cs
 pipx install certipy-ad
 
 echo "[*] Clonando ferramentas..."
-git clone https://github.com/openwall/john -b bleeding-jumbo ~/Tools/john-jumbo
-git clone https://github.com/sqlmapproject/sqlmap ~/Tools/sqlmap
-sudo git clone https://github.com/danielmiessler/SecLists.git /usr/share/wordlists/SecLists
-git clone https://github.com/ticarpi/jwt_tool.git ~/Tools/jwt_tool
-git clone https://github.com/internetwache/GitTools.git ~/Tools/GitTools
-git clone https://github.com/cddmp/enum4linux-ng ~/Tools/enum4linux-ng
+gclone https://github.com/openwall/john -b ~/Tools/john-jumbo
+gclone https://github.com/sqlmapproject/sqlmap ~/Tools/sqlmap
+sudo gclone https://github.com/danielmiessler/SecLists.git /usr/share/wordlists/SecLists
+gclone https://github.com/ticarpi/jwt_tool.git ~/Tools/jwt_tool
+gclone https://github.com/internetwache/GitTools.git ~/Tools/GitTools
+gclone https://github.com/cddmp/enum4linux-ng ~/Tools/enum4linux-ng
 
 echo "[*] Compilando John the Ripper..."
 cd ~/Tools/john-jumbo/src
@@ -280,7 +294,7 @@ gunzip -f chisel.gz && chmod +x chisel
 gunzip -f chisel.exe.gz
 
 # ----------- CUPP -----------
-git clone https://github.com/Mebus/cupp.git
+gclone https://github.com/Mebus/cupp.git
 
 # ----------- GHIDRA (zip manual) -----------
 GHIDRA_URL="https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_11.0.2_build/ghidra_11.0.2_PUBLIC_20240711.zip"
@@ -291,14 +305,14 @@ wget -q https://hashcat.net/files/hashcat-7.1.2.7z -O hashcat.7z
 7z x hashcat.7z -ohashcat_beta && rm hashcat.7z
 
 # ----------- MIMIKATZ -----------
-git clone https://github.com/gentilkiwi/mimikatz.git
+gclone https://github.com/gentilkiwi/mimikatz.git
 
 # ----------- RESPONDER -----------
-git clone https://github.com/lgandx/Responder.git
-sudo ln -s ~/Tools/Responder/Responder.py /usr/local/bin/responder
+gclone https://github.com/lgandx/Responder.git
+safelink "$HOME/Tools/Responder/Responder.py" /usr/local/bin/responder
 
 # ----------- XSStrike -----------
-git clone https://github.com/s0md3v/XSStrike.git
+gclone https://github.com/s0md3v/XSStrike.git
 
 # ----------- LINPEAS -----------
 wget -q https://github.com/peass-ng/PEASS-ng/releases/download/20250904-27f4363e/linpeas_linux_amd64 -O linpeas
@@ -312,10 +326,10 @@ wget -q https://github.com/antonioCoco/RunasCs/releases/download/v1.5/RunasCs.zi
 unzip -q RunasCs.zip -d RunasCs && mv RunasCs/* . && rm -rf RunasCs.zip RunasCs
 
 # ----------- PowerSploit -----------
-git clone https://github.com/PowerShellMafia/PowerSploit.git
+gclone https://github.com/PowerShellMafia/PowerSploit.git
 
 # ----------- PKINITtools -----------
-git clone https://github.com/dirkjanm/PKINITtools.git
+gclone https://github.com/dirkjanm/PKINITtools.git
 
 # ----------- Certify -----------
 wget https://github.com/jakobfriedl/precompiled-binaries/raw/main/LateralMovement/CertificateAbuse/Certify.exe
@@ -344,10 +358,15 @@ rm ../ligolo-ng_*.zip ../ligolo-ng_*.tar.gz
 cd ..
 
 # ----------- BLOODHOUND LAB (Community Edition) -----------
-wget https://github.com/SpecterOps/bloodhound-cli/releases/latest/download/bloodhound-cli-linux-amd64.tar.gz
-tar -xvzf bloodhound-cli-linux-amd64.tar.gz
-cd bloodhound-lab && ./bloodhound-cli install
-cd ..
+if ! command -v bloodhound-cli >/dev/null 2>&1; then
+  wget -q https://github.com/SpecterOps/bloodhound-cli/releases/latest/download/bloodhound-cli-linux-amd64.tar.gz -O /tmp/bh.tar.gz
+  tar -xzf /tmp/bh.tar.gz -C "$HOME/Tools"    # extrai "bloodhound-cli"
+  chmod +x "$HOME/Tools/bloodhound-cli"
+  "$HOME/Tools/bloodhound-cli" install
+  rm -f /tmp/bh.tar.gz
+else
+  echo "[*] bloodhound-cli já presente, pulando."
+fi
 
 echo "[+] Ferramentas adicionais instaladas em ~/Tools!"
 
