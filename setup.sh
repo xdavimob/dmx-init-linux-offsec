@@ -70,6 +70,7 @@ pipx install "frida-tools<14"
 pipx install mitmproxy
 pipx runpip objection install --force-reinstall "frida==16.7.19"
 pipx install git-dumper
+pipx install git+https://github.com/Pennyw0rth/NetExec
 
 echo "[*] Clonando ferramentas..."
 git clone https://github.com/openwall/john -b bleeding-jumbo ~/Tools/john-jumbo
