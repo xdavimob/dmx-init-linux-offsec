@@ -7,16 +7,25 @@
 set -e  # Parar em erros
 set -u  # Erro em variáveis indefinidas
 
-gclone() { # gclone <url> <dest> [sudo]
-  local url="$1" dest="$2" sud=""
+gclone() { # gclone <url> [<dest>] [sudo]
+  local url="${1:?url obrigatório}" dest="${2:-}" sud=""
+  # se o 3º arg for "sudo", usa sudo
   [ "${3:-}" = "sudo" ] && sud="sudo "
+
+  # se não passou <dest>, usa o nome do repo na pasta atual
+  if [ -z "$dest" ]; then
+    local name="${url##*/}"; name="${name%.git}"
+    dest="$PWD/$name"
+  fi
+
+  mkdir -p "$(dirname "$dest")"
   if [ -d "$dest/.git" ]; then
     ${sud}git -C "$dest" pull --ff-only || ${sud}git -C "$dest" fetch --all --tags
   else
-    mkdir -p "$(dirname "$dest")"
     ${sud}git clone --depth 1 "$url" "$dest"
   fi
 }
+
 
 safelink() { # safelink <target> <link>
   sudo ln -sfn "$1" "$2"
@@ -102,7 +111,7 @@ else
   command -v apt-get >/dev/null 2>&1 && \
     sudo apt-get update -y && sudo apt-get install -y build-essential git libldns-dev
 
-  gclone --depth 1 https://github.com/blechschmidt/massdns.git "$HOME/Tools/massdns"
+  gclone https://github.com/blechschmidt/massdns.git "$HOME/Tools/massdns"
   make -C "$HOME/Tools/massdns" -j"$(nproc)"
   sudo make -C "$HOME/Tools/massdns" install
 fi
@@ -138,7 +147,7 @@ pipx install certipy-ad
 echo "[*] Clonando ferramentas..."
 gclone https://github.com/openwall/john -b ~/Tools/john-jumbo
 gclone https://github.com/sqlmapproject/sqlmap ~/Tools/sqlmap
-sudo gclone https://github.com/danielmiessler/SecLists.git /usr/share/wordlists/SecLists
+gclone https://github.com/danielmiessler/SecLists.git /usr/share/wordlists/SecLists sudo
 gclone https://github.com/ticarpi/jwt_tool.git ~/Tools/jwt_tool
 gclone https://github.com/internetwache/GitTools.git ~/Tools/GitTools
 gclone https://github.com/cddmp/enum4linux-ng ~/Tools/enum4linux-ng
