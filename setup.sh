@@ -165,7 +165,9 @@ else
   git -C "$HOME/Tools/john-jumbo" checkout bleeding-jumbo
   git -C "$HOME/Tools/john-jumbo" pull --ff-only
 fi
-git_sync "https://github.com/sqlmapproject/sqlmap"          "$HOME/Tools/sqlmap"
+if [ -e "$HOME/Tools/sqlmap" ] && [ ! -d "$HOME/Tools/sqlmap/.git" ]; then
+  mv "$HOME/Tools/sqlmap" "$HOME/Tools/sqlmap.bak.$(date +%s)"
+fi
 git_sync "https://github.com/danielmiessler/SecLists.git"  "/usr/share/wordlists/SecLists" "sudo"
 git_sync "https://github.com/ticarpi/jwt_tool.git"         "$HOME/Tools/jwt_tool"
 git_sync "https://github.com/internetwache/GitTools.git"  "$HOME/Tools/GitTools"
