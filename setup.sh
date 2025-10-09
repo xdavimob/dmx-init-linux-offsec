@@ -64,9 +64,23 @@ mkdir -p ~/Tools ~/Mobile ~/CTF ~/go/{bin,src,pkg}
 sudo mkdir -p /usr/share/wordlists
 
 echo "[*] Clonando plugins do ZSH..."
-gclone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-gclone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-gclone https://github.com/zsh-users/zsh-history-substring-search ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-history-substring-search
+
+ZSH_CUSTOM_DIR="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+PLUG_BASE="$ZSH_CUSTOM_DIR/plugins"
+mkdir -p "$PLUG_BASE"
+
+clone_or_update() { # clone_or_update <repo> <name>
+  local repo="$1" name="$2" dest="$PLUG_BASE/$name"
+  if [ -d "$dest/.git" ]; then
+    git -C "$dest" pull --ff-only || git -C "$dest" fetch --all --tags
+  else
+    git clone --depth 1 "$repo" "$dest"
+  fi
+}
+
+clone_or_update https://github.com/zsh-users/zsh-autosuggestions            zsh-autosuggestions
+clone_or_update https://github.com/zsh-users/zsh-syntax-highlighting.git    zsh-syntax-highlighting
+clone_or_update https://github.com/zsh-users/zsh-history-substring-search   zsh-history-substring-search
 
 echo "[*] Instalando pacotes via go..."
 go install github.com/projectdiscovery/httpx/cmd/httpx@latest
