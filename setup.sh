@@ -8,7 +8,6 @@ set -e  # Parar em erros
 set -u  # Erro em variáveis indefinidas
 
 # git_sync <repo_url> <dest> [branch] [sudo]
-# git_sync <repo_url> <dest> [branch] [sudo]
 git_sync() {
   local url="${1:?url}"; local dest="${2:?dest}"
   local br=""; local sud=""
