@@ -360,7 +360,7 @@ echo "[*] Baixando ferramentas adicionais para ~/Tools..."
 cd ~/Tools
 
 # ----------- LaZagne -----------
-wget https://github.com/AlessandroZ/LaZagne/releases/download/v2.4.7/LaZagne.exe
+[ -s LaZagne.exe ] || wget -q "https://github.com/AlessandroZ/LaZagne/releases/download/v2.4.7/LaZagne.exe" -O LaZagne.exe
 
 # ----------- CHISEL (Linux + Windows) -----------
 wget -q https://github.com/jpillora/chisel/releases/download/v1.10.1/chisel_1.10.1_linux_amd64.gz -O chisel.gz
@@ -408,13 +408,14 @@ git_sync https://github.com/PowerShellMafia/PowerSploit.git
 git_sync https://github.com/dirkjanm/PKINITtools.git
 
 # ----------- Certify -----------
-wget https://github.com/jakobfriedl/precompiled-binaries/raw/main/LateralMovement/CertificateAbuse/Certify.exe
+[ -s Certify.exe ] || wget -q "https://github.com/jakobfriedl/precompiled-binaries/raw/main/LateralMovement/CertificateAbuse/Certify.exe" -O Certify.exe
+
 
 # ----------- PowerUp -----------
-wget https://github.com/jakobfriedl/precompiled-binaries/raw/main/Scripts/PowerUp.ps1
+[ -s PowerUp.ps1 ] || wget -q "https://github.com/jakobfriedl/precompiled-binaries/raw/main/Scripts/PowerUp.ps1" -O PowerUp.ps1
 
 # ----------- PowerView -----------
-wget https://github.com/jakobfriedl/precompiled-binaries/raw/main/Scripts/PowerView.ps1
+[ -s PowerView.ps1 ] || wget -q "https://github.com/jakobfriedl/precompiled-binaries/raw/main/Scripts/PowerView.ps1" -O PowerView.ps1
 
 # ----------- Rubeus -----------
 [ -s Rubeus.exe ] || wget -q "https://github.com/jakobfriedl/precompiled-binaries/raw/main/LateralMovement/Rubeus.exe" -O Rubeus.exe
@@ -434,15 +435,19 @@ rm -f ../ligolo-ng_*.zip ../ligolo-ng_*.tar.gz
 cd ..
 
 # ----------- BLOODHOUND LAB (Community Edition) -----------
-if ! command -v bloodhound-cli >/dev/null 2>&1; then
-  if systemctl is-active --quiet docker; then
+BH="$HOME/Tools/bloodhound-cli"
+
+# Só instala se NÃO existir nem no PATH nem em $HOME/Tools
+if ! command -v bloodhound-cli >/dev/null 2>&1 && [ ! -x "$BH" ]; then
+  # Só prossegue se o Docker estiver realmente operacional
+  if docker info >/dev/null 2>&1; then
     wget -q https://github.com/SpecterOps/bloodhound-cli/releases/latest/download/bloodhound-cli-linux-amd64.tar.gz -O /tmp/bh.tar.gz
-    tar -xzf /tmp/bh.tar.gz -C "$HOME/Tools"
-    chmod +x "$HOME/Tools/bloodhound-cli"
-    "$HOME/Tools/bloodhound-cli" install
+    tar -xzf /tmp/bh.tar.gz -C "$HOME/Tools"   # extrai 'bloodhound-cli'
+    chmod +x "$BH"
+    "$BH" install
     rm -f /tmp/bh.tar.gz
   else
-    echo "[!] Docker instalado porém **não rodando**; pulando bloodhound-cli agora. (inicie Docker e rode este bloco depois)"
+    echo "[!] Docker não está rodando; pulando instalação do bloodhound-cli (inicie o Docker e rode este bloco depois)."
   fi
 else
   echo "[*] bloodhound-cli já presente, pulando."
