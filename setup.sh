@@ -8,9 +8,14 @@ set -e  # Parar em erros
 set -u  # Erro em variáveis indefinidas
 
 # git_sync <repo_url> <dest> [branch] [sudo]
+# git_sync <repo_url> <dest> [branch] [sudo]
 git_sync() {
   local url="${1:?url}"; local dest="${2:?dest}"
-  local br="${3:-}"; local sud=""; [ "${4:-}" = "sudo" ] && sud="sudo "
+  local br=""; local sud=""
+  # aceita 'sudo' no 3º ou 4º argumento
+  case "${3:-}" in "" ) ;; "sudo" ) sud="sudo " ;; * ) br="$3" ;; esac
+  case "${4:-}" in "" ) ;; "sudo" ) sud="sudo " ;; * ) ;; esac
+
   local parent; parent="$(dirname "$dest")"
   [ -n "$sud" ] && ${sud}mkdir -p "$parent" || mkdir -p "$parent"
 
@@ -168,7 +173,7 @@ fi
 if [ -e "$HOME/Tools/sqlmap" ] && [ ! -d "$HOME/Tools/sqlmap/.git" ]; then
   mv "$HOME/Tools/sqlmap" "$HOME/Tools/sqlmap.bak.$(date +%s)"
 fi
-git_sync "https://github.com/danielmiessler/SecLists.git"  "/usr/share/wordlists/SecLists" "sudo"
+git_sync "https://github.com/danielmiessler/SecLists.git" "/usr/share/wordlists/SecLists" "" "sudo"
 git_sync "https://github.com/ticarpi/jwt_tool.git"         "$HOME/Tools/jwt_tool"
 git_sync "https://github.com/internetwache/GitTools.git"  "$HOME/Tools/GitTools"
 git_sync "https://github.com/cddmp/enum4linux-ng"         "$HOME/Tools/enum4linux-ng"
