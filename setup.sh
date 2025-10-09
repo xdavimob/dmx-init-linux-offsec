@@ -140,11 +140,13 @@ chmod +x setup-impacket-like-kali.sh
 
 echo "[*] Criando venv para enum4linux-ng..."
 cd ~/Tools/enum4linux-ng
-python3 -m venv venv
-source venv/bin/activate
-pip install -U pip
-pip install -r requirements.txt
-deactivate
+if [ ! -d venv ]; then
+  python3 -m venv venv
+  source venv/bin/activate
+  pip install -U pip
+  pip install -r requirements.txt
+  deactivate
+fi
 
 echo "[*] Adicionando configurações ao .zshrc..."
 cat <<'EOF' >> ~/.zshrc
@@ -302,7 +304,8 @@ wget -q "$GHIDRA_URL" -O ghidra.zip && unzip -q ghidra.zip -d ghidra && rm ghidr
 
 # ----------- HASHCAT -----------
 wget -q https://hashcat.net/files/hashcat-7.1.2.7z -O hashcat.7z
-7z x hashcat.7z -ohashcat_beta && rm hashcat.7z
+7z x -y -aoa hashcat.7z -ohashcat_beta
+rm -f hashcat.7z
 
 # ----------- MIMIKATZ -----------
 gclone https://github.com/gentilkiwi/mimikatz.git
