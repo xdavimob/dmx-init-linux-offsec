@@ -78,18 +78,18 @@ if git --version >/dev/null 2>&1; then
   ZSH_CUSTOM_DIR="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
   PLUG_BASE="$ZSH_CUSTOM_DIR/plugins"; mkdir -p "$PLUG_BASE"
 
-  clone_or_update() {
+  clone_or_update() { # <repo> <name>
     local repo="$1" dest="$PLUG_BASE/$2"
     if [ -d "$dest/.git" ]; then
       git -C "$dest" pull --ff-only || git -C "$dest" fetch --all --tags
     else
-      gclone --depth 1 "$repo" "$dest"
+      git clone --depth 1 "$repo" "$dest"
     fi
   }
 
-  clone_or_update https://github.com/zsh-users/zsh-autosuggestions            zsh-autosuggestions
-  clone_or_update https://github.com/zsh-users/zsh-syntax-highlighting.git    zsh-syntax-highlighting
-  clone_or_update https://github.com/zsh-users/zsh-history-substring-search   zsh-history-substring-search
+  clone_or_update "https://github.com/zsh-users/zsh-autosuggestions"          "zsh-autosuggestions"
+  clone_or_update "https://github.com/zsh-users/zsh-syntax-highlighting.git"  "zsh-syntax-highlighting"
+  clone_or_update "https://github.com/zsh-users/zsh-history-substring-search" "zsh-history-substring-search"
 else
   echo "[!] git indisponível (ou corrompido). Pulando plugins do ZSH por enquanto."
 fi
