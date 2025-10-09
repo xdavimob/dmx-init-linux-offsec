@@ -33,7 +33,7 @@ sudo apt install -y \
     python3 python3-pip python3-venv openjdk-21-jdk openjdk-21-jre jq ruby ruby-dev build-essential \
     gcc make cmake sqlite3 zip p7zip-full tree gnupg fzf lsb-release htop bat silversearcher-ag \
     ripgrep neofetch xclip gobuster ffuf masscan dirb nikto hydra radare2 apktool scrcpy adb \
-    tshark wireshark tcpdump smbclient nbtscan ldap-utils rlwrap golang-go pipx libssl-dev \
+    tshark tcpdump smbclient nbtscan ldap-utils rlwrap golang-go pipx libssl-dev \
     zlib1g-dev yasm libgmp-dev libpcap-dev pkg-config libbz2-dev libnss3-dev eza fonts-firacode
 
 echo "[*] Instalando Rust (cargo, rustup)..."
@@ -71,6 +71,8 @@ pipx install mitmproxy
 pipx runpip objection install --force-reinstall "frida==16.7.19"
 pipx install git-dumper
 pipx install git+https://github.com/Pennyw0rth/NetExec
+pipx install pwncat-cs
+pipx install certipy-ad
 
 echo "[*] Clonando ferramentas..."
 git clone https://github.com/openwall/john -b bleeding-jumbo ~/Tools/john-jumbo
@@ -238,6 +240,9 @@ echo "[*] Baixando ferramentas adicionais para ~/Tools..."
 
 cd ~/Tools
 
+# ----------- LaZagne -----------
+wget https://github.com/AlessandroZ/LaZagne/releases/download/v2.4.7/LaZagne.exe
+
 # ----------- CHISEL (Linux + Windows) -----------
 wget -q https://github.com/jpillora/chisel/releases/download/v1.10.1/chisel_1.10.1_linux_amd64.gz -O chisel.gz
 wget -q https://github.com/jpillora/chisel/releases/download/v1.10.1/chisel_1.10.1_windows_amd64.gz -O chisel.exe.gz
@@ -258,11 +263,9 @@ wget -q https://hashcat.net/files/hashcat-7.1.2.7z -O hashcat.7z
 # ----------- MIMIKATZ -----------
 git clone https://github.com/gentilkiwi/mimikatz.git
 
-# ----------- PWNcat-CS -----------
-git clone https://github.com/cytopia/pwncat.git pwncat-cs
-
 # ----------- RESPONDER -----------
 git clone https://github.com/lgandx/Responder.git
+sudo ln -s ~/Tools/Responder/Responder.py /usr/local/bin/responder
 
 # ----------- XSStrike -----------
 git clone https://github.com/s0md3v/XSStrike.git
@@ -277,6 +280,24 @@ wget -q https://github.com/peass-ng/PEASS-ng/releases/download/20250904-27f4363e
 # ----------- RunasCs -----------
 wget -q https://github.com/antonioCoco/RunasCs/releases/download/v1.5/RunasCs.zip
 unzip -q RunasCs.zip -d RunasCs && mv RunasCs/* . && rm -rf RunasCs.zip RunasCs
+
+# ----------- PowerSploit -----------
+git clone https://github.com/PowerShellMafia/PowerSploit.git
+
+# ----------- PKINITtools -----------
+git clone https://github.com/dirkjanm/PKINITtools.git
+
+# ----------- Certify -----------
+wget https://github.com/jakobfriedl/precompiled-binaries/raw/main/LateralMovement/CertificateAbuse/Certify.exe
+
+# ----------- PowerUp -----------
+wget https://github.com/jakobfriedl/precompiled-binaries/raw/main/Scripts/PowerUp.ps1
+
+# ----------- PowerView -----------
+wget https://github.com/jakobfriedl/precompiled-binaries/raw/main/Scripts/PowerView.ps1
+
+# ----------- Rubeus -----------
+wget https://github.com/jakobfriedl/precompiled-binaries/raw/main/LateralMovement/Rubeus.exe
 
 # ----------- LIGOLO-NG (Linux + Windows) -----------
 wget -q https://github.com/nicocha30/ligolo-ng/releases/download/v0.8.2/ligolo-ng_agent_0.8.2_windows_amd64.zip
