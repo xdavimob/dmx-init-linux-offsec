@@ -13,6 +13,7 @@ gclone() { # gclone <url> <dest> [sudo]
   if [ -d "$dest/.git" ]; then
     ${sud}git -C "$dest" pull --ff-only || ${sud}git -C "$dest" fetch --all --tags
   else
+    mkdir -p "$(dirname "$dest")"
     ${sud}gclone --depth 1 "$url" "$dest"
   fi
 }
@@ -73,7 +74,7 @@ if git --version >/dev/null 2>&1; then
     if [ -d "$dest/.git" ]; then
       git -C "$dest" pull --ff-only || git -C "$dest" fetch --all --tags
     else
-      git clone --depth 1 "$repo" "$dest"
+      gclone --depth 1 "$repo" "$dest"
     fi
   }
 
