@@ -14,7 +14,7 @@ gclone() { # gclone <url> <dest> [sudo]
     ${sud}git -C "$dest" pull --ff-only || ${sud}git -C "$dest" fetch --all --tags
   else
     mkdir -p "$(dirname "$dest")"
-    ${sud}gclone --depth 1 "$url" "$dest"
+    ${sud}git clone --depth 1 "$url" "$dest"
   fi
 }
 
