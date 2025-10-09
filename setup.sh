@@ -12,30 +12,26 @@ git_sync() {
   local url="${1:?url}"; local dest="${2:?dest}"
   local br="${3:-}"; local sud=""; [ "${4:-}" = "sudo" ] && sud="sudo "
   local parent; parent="$(dirname "$dest")"
-
-  # cria pasta pai (com sudo se destino for de root)
-  if [ -n "$sud" ]; then ${sud}mkdir -p "$parent"; else mkdir -p "$parent"; fi
+  [ -n "$sud" ] && ${sud}mkdir -p "$parent" || mkdir -p "$parent"
 
   if [ -d "$dest/.git" ]; then
     ${sud}git -C "$dest" fetch --all --tags
-    if [ -n "$br" ]; then ${sud}git -C "$dest" checkout "$br"; fi
+    [ -n "$br" ] && ${sud}git -C "$dest" checkout "$br"
     ${sud}git -C "$dest" pull --ff-only || true
-    echo "[=] Atualizado: $dest"
-    return 0
+    echo "[=] Atualizado: $dest"; return 0
   fi
 
   if [ -e "$dest" ] && [ ! -d "$dest/.git" ]; then
     if [ "${FORCE:-0}" = "1" ]; then
       local bak="${dest}.bak.$(date +%Y%m%d%H%M%S)"
       echo "[!] $dest existe e não é git. Movendo para $bak (FORCE=1)."
-      ${sud}mv "$dest" "$bak"
+      [ -n "$sud" ] && ${sud}mv "$dest" "$bak" || mv "$dest" "$bak"
     else
-      echo "[!] $dest existe e não é git. Pulando (use FORCE=1 para sobrescrever)."
+      echo "[!] $dest existe e não é git. Pulando (use FORCE=1 p/ substituir)."
       return 0
     fi
   fi
 
-  # clone novo
   if [ -n "$br" ]; then
     ${sud}git clone --depth 1 -b "$br" "$url" "$dest"
   else
