@@ -7,25 +7,42 @@
 set -e  # Parar em erros
 set -u  # Erro em variáveis indefinidas
 
-gclone() { # gclone <url> [<dest>] [sudo]
-  local url="${1:?url obrigatório}" dest="${2:-}" sud=""
-  # se o 3º arg for "sudo", usa sudo
-  [ "${3:-}" = "sudo" ] && sud="sudo "
+# git_sync <repo_url> <dest> [branch] [sudo]
+git_sync() {
+  local url="${1:?url}"; local dest="${2:?dest}"
+  local br="${3:-}"; local sud=""; [ "${4:-}" = "sudo" ] && sud="sudo "
+  local parent; parent="$(dirname "$dest")"
 
-  # se não passou <dest>, usa o nome do repo na pasta atual
-  if [ -z "$dest" ]; then
-    local name="${url##*/}"; name="${name%.git}"
-    dest="$PWD/$name"
+  # cria pasta pai (com sudo se destino for de root)
+  if [ -n "$sud" ]; then ${sud}mkdir -p "$parent"; else mkdir -p "$parent"; fi
+
+  if [ -d "$dest/.git" ]; then
+    ${sud}git -C "$dest" fetch --all --tags
+    if [ -n "$br" ]; then ${sud}git -C "$dest" checkout "$br"; fi
+    ${sud}git -C "$dest" pull --ff-only || true
+    echo "[=] Atualizado: $dest"
+    return 0
   fi
 
-  mkdir -p "$(dirname "$dest")"
-  if [ -d "$dest/.git" ]; then
-    ${sud}git -C "$dest" pull --ff-only || ${sud}git -C "$dest" fetch --all --tags
+  if [ -e "$dest" ] && [ ! -d "$dest/.git" ]; then
+    if [ "${FORCE:-0}" = "1" ]; then
+      local bak="${dest}.bak.$(date +%Y%m%d%H%M%S)"
+      echo "[!] $dest existe e não é git. Movendo para $bak (FORCE=1)."
+      ${sud}mv "$dest" "$bak"
+    else
+      echo "[!] $dest existe e não é git. Pulando (use FORCE=1 para sobrescrever)."
+      return 0
+    fi
+  fi
+
+  # clone novo
+  if [ -n "$br" ]; then
+    ${sud}git clone --depth 1 -b "$br" "$url" "$dest"
   else
     ${sud}git clone --depth 1 "$url" "$dest"
   fi
+  echo "[+] Clonado: $dest"
 }
-
 
 safelink() { # safelink <target> <link>
   sudo ln -sfn "$1" "$2"
@@ -111,7 +128,7 @@ else
   command -v apt-get >/dev/null 2>&1 && \
     sudo apt-get update -y && sudo apt-get install -y build-essential git libldns-dev
 
-  gclone https://github.com/blechschmidt/massdns.git "$HOME/Tools/massdns"
+  git_sync https://github.com/blechschmidt/massdns.git "$HOME/Tools/massdns"
   make -C "$HOME/Tools/massdns" -j"$(nproc)"
   sudo make -C "$HOME/Tools/massdns" install
 fi
@@ -328,7 +345,7 @@ gunzip -f chisel.gz && chmod +x chisel
 gunzip -f chisel.exe.gz
 
 # ----------- CUPP -----------
-gclone https://github.com/Mebus/cupp.git
+git_sync https://github.com/Mebus/cupp.git
 
 # ----------- GHIDRA (zip manual) -----------
 GHIDRA_URL="https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_11.0.2_build/ghidra_11.0.2_PUBLIC_20240711.zip"
@@ -340,14 +357,14 @@ wget -q https://hashcat.net/files/hashcat-7.1.2.7z -O hashcat.7z
 rm -f hashcat.7z
 
 # ----------- MIMIKATZ -----------
-gclone https://github.com/gentilkiwi/mimikatz.git
+git_sync https://github.com/gentilkiwi/mimikatz.git
 
 # ----------- RESPONDER -----------
-gclone https://github.com/lgandx/Responder.git
+git_sync https://github.com/lgandx/Responder.git
 safelink "$HOME/Tools/Responder/Responder.py" /usr/local/bin/responder
 
 # ----------- XSStrike -----------
-gclone https://github.com/s0md3v/XSStrike.git
+git_sync https://github.com/s0md3v/XSStrike.git
 
 # ----------- LINPEAS -----------
 wget -q https://github.com/peass-ng/PEASS-ng/releases/download/20250904-27f4363e/linpeas_linux_amd64 -O linpeas
@@ -361,10 +378,10 @@ wget -q https://github.com/antonioCoco/RunasCs/releases/download/v1.5/RunasCs.zi
 unzip -q RunasCs.zip -d RunasCs && mv RunasCs/* . && rm -rf RunasCs.zip RunasCs
 
 # ----------- PowerSploit -----------
-gclone https://github.com/PowerShellMafia/PowerSploit.git
+git_sync https://github.com/PowerShellMafia/PowerSploit.git
 
 # ----------- PKINITtools -----------
-gclone https://github.com/dirkjanm/PKINITtools.git
+git_sync https://github.com/dirkjanm/PKINITtools.git
 
 # ----------- Certify -----------
 wget https://github.com/jakobfriedl/precompiled-binaries/raw/main/LateralMovement/CertificateAbuse/Certify.exe
