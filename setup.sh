@@ -9,11 +9,23 @@ set -u  # Erro em variáveis indefinidas
 
 # git_sync <repo_url> <dest> [branch] [sudo]
 git_sync() {
-  local url="${1:?url}"; local dest="${2:?dest}"
-  local br=""; local sud=""
+  set +u  # evita crash se $2 não vier
+  local url="$1" dest="$2" br="" sud=""
+  set -u
+
   # aceita 'sudo' no 3º ou 4º argumento
   case "${3:-}" in "" ) ;; "sudo" ) sud="sudo " ;; * ) br="$3" ;; esac
   case "${4:-}" in "" ) ;; "sudo" ) sud="sudo " ;; * ) ;; esac
+
+  # se <dest> não veio, deduz pelo nome do repo
+  if [ -z "${dest:-}" ]; then
+    local name="${url##*/}"; name="${name%.git}"
+    dest="$PWD/$name"
+  fi
+  if [ -z "${url:-}" ] || [ -z "${dest:-}" ]; then
+    echo "[x] git_sync: uso: git_sync <url> <dest> [branch] [sudo]" >&2
+    return 2
+  fi
 
   local parent; parent="$(dirname "$dest")"
   [ -n "$sud" ] && ${sud}mkdir -p "$parent" || mkdir -p "$parent"
@@ -26,7 +38,9 @@ git_sync() {
   fi
 
   if [ -e "$dest" ] && [ ! -d "$dest/.git" ]; then
-    if [ "${FORCE:-0}" = "1" ]; then
+    if [ -d "$dest" ] && [ -z "$(ls -A "$dest" 2>/dev/null)" ]; then
+      :  # diretório vazio: ok
+    elif [ "${FORCE:-0}" = "1" ]; then
       local bak="${dest}.bak.$(date +%Y%m%d%H%M%S)"
       echo "[!] $dest existe e não é git. Movendo para $bak (FORCE=1)."
       [ -n "$sud" ] && ${sud}mv "$dest" "$bak" || mv "$dest" "$bak"
@@ -36,11 +50,19 @@ git_sync() {
     fi
   fi
 
-  if [ -n "$br" ]; then
-    ${sud}git clone --depth 1 -b "$br" "$url" "$dest"
-  else
-    ${sud}git clone --depth 1 "$url" "$dest"
-  fi
+  local try rc=0
+  for try in 1 2 3; do
+    if [ -n "$br" ]; then
+      ${sud}git clone --depth 1 -b "$br" "$url" "$dest" && rc=0 || rc=$?
+    else
+      ${sud}git clone --depth 1 "$url" "$dest" && rc=0 || rc=$?
+    fi
+    [ $rc -eq 0 ] && break
+    echo "[!] clone falhou (tentativa $try). Retentando..."; sleep 2
+  done
+  [ $rc -ne 0 ] && { echo "[x] Falha no clone: $url"; return $rc; }
+
+  [ -n "$sud" ] && ${sud}git config --global --add safe.directory "$dest" || true
   echo "[+] Clonado: $dest"
 }
 
