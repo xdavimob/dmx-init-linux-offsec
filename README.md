@@ -10,7 +10,7 @@ Ideal for preparing WSL, Kali Linux, or Ubuntu environments focused on pentestin
 
 ```bash
 wget https://raw.githubusercontent.com/xdavimob/dmx-init-linux-offsec/main/setup.sh
-chmod +x https://raw.githubusercontent.com/xdavimob/dmx-init-linux-offsec/main/setup.sh
+chmod +x setup.sh
 ./setup.sh
 ````
 
