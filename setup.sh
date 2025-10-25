@@ -437,8 +437,8 @@ rm -f ../ligolo-ng_*.zip ../ligolo-ng_*.tar.gz
 cd ..
 
 # ----------- BLOODHOUND LAB (Community Edition) -----------
-BH="$HOME/Tools/bloodhound-cli"
-mkdir -p "$HOME/Tools"
+BH="$HOME/Tools/BloodHound/bloodhound-cli"
+mkdir -p "$HOME/Tools/BloodHound/"
 
 have_docker() {
   docker info >/dev/null 2>&1 || sudo -n docker info >/dev/null 2>&1
@@ -449,7 +449,7 @@ if ! command -v bloodhound-cli >/dev/null 2>&1 && [ ! -x "$BH" ]; then
     wget -q https://github.com/SpecterOps/bloodhound-cli/releases/latest/download/bloodhound-cli-linux-amd64.tar.gz -O /tmp/bh.tar.gz
     # confira o nome do binário dentro do tar se precisar:
     # tar -tzf /tmp/bh.tar.gz | head
-    tar -xzf /tmp/bh.tar.gz -C "$HOME/Tools"
+    tar -xzf /tmp/bh.tar.gz -C "$HOME/Tools/BloodHound"
     chmod +x "$BH" 2>/dev/null || true
     # se só com sudo o Docker funciona, instale com sudo
     if docker info >/dev/null 2>&1; then
