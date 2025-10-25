@@ -448,12 +448,12 @@ if ! command -v bloodhound-cli >/dev/null 2>&1 && [ ! -x "$BH" ]; then
     "$BH" install
     rm -f /tmp/bh.tar.gz
   else
-    echo "[!] Docker não está rodando; pulando instalação do bloodhound-cli (inicie o Docker e rode este bloco depois)."
+    echo '[!] Docker não está rodando; pulando instalação do bloodhound-cli (inicie o Docker e rode este bloco depois).'
   fi
 else
   echo "[*] bloodhound-cli já presente, pulando."
 fi
 
-echo "[+] Ferramentas adicionais instaladas em ~/Tools!"
+echo '[+] Ferramentas adicionais instaladas em ~/Tools!'
 
 echo "[*] Setup finalizado. Reinicie o terminal ou execute 'source ~/.zshrc' para aplicar as mudanças."
