@@ -438,21 +438,31 @@ cd ..
 
 # ----------- BLOODHOUND LAB (Community Edition) -----------
 BH="$HOME/Tools/bloodhound-cli"
+mkdir -p "$HOME/Tools"
 
-# Só instala se NÃO existir nem no PATH nem em $HOME/Tools
+have_docker() {
+  docker info >/dev/null 2>&1 || sudo -n docker info >/dev/null 2>&1
+}
+
 if ! command -v bloodhound-cli >/dev/null 2>&1 && [ ! -x "$BH" ]; then
-  # Só prossegue se o Docker estiver realmente operacional
-  if docker info >/dev/null 2>&1; then
+  if have_docker; then
     wget -q https://github.com/SpecterOps/bloodhound-cli/releases/latest/download/bloodhound-cli-linux-amd64.tar.gz -O /tmp/bh.tar.gz
-    tar -xzf /tmp/bh.tar.gz -C "$HOME/Tools"   # extrai 'bloodhound-cli'
-    chmod +x "$BH"
-    "$BH" install
+    # confira o nome do binário dentro do tar se precisar:
+    # tar -tzf /tmp/bh.tar.gz | head
+    tar -xzf /tmp/bh.tar.gz -C "$HOME/Tools"
+    chmod +x "$BH" 2>/dev/null || true
+    # se só com sudo o Docker funciona, instale com sudo
+    if docker info >/dev/null 2>&1; then
+      "$BH" install
+    else
+      sudo "$BH" install
+    fi
     rm -f /tmp/bh.tar.gz
   else
-    echo '[!] Docker não está rodando; pulando instalação do bloodhound-cli (inicie o Docker e rode este bloco depois).'
+    echo '[!] Docker não está rodando ou sem permissão; ajuste (service/WSL/group docker) e rode de novo.'
   fi
 else
-  echo "[*] bloodhound-cli já presente, pulando."
+  echo '[*] bloodhound-cli já presente, pulando.'
 fi
 
 echo '[+] Ferramentas adicionais instaladas em ~/Tools!'
