@@ -97,7 +97,8 @@ sudo apt install -y \
     gcc make cmake sqlite3 zip p7zip-full tree gnupg fzf lsb-release htop bat silversearcher-ag \
     ripgrep neofetch xclip gobuster ffuf masscan dirb nikto hydra radare2 apktool scrcpy adb \
     tshark tcpdump smbclient nbtscan ldap-utils rlwrap golang-go pipx libssl-dev \
-    zlib1g-dev yasm libgmp-dev libpcap-dev pkg-config libbz2-dev libnss3-dev eza fonts-firacode
+    zlib1g-dev yasm libgmp-dev libpcap-dev pkg-config libbz2-dev libnss3-dev eza fonts-firacode \
+    docker-buildx docker-compose docker-compose-v2 docker.io
 
 echo "[*] Instalando Rust (cargo, rustup)..."
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
