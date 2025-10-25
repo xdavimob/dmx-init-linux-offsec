@@ -177,7 +177,8 @@ echo "[*] Instalando via pipx..."
 pipx ensurepath
 pipx install "frida-tools<14"
 pipx install mitmproxy
-#pipx runpip objection install "frida==16.7.19"
+pipx install objection
+pipx runpip objection install "frida==16.7.19"
 pipx install git-dumper
 pipx install git+https://github.com/Pennyw0rth/NetExec
 pipx install pwncat-cs
