@@ -361,6 +361,9 @@ echo "[*] Baixando ferramentas adicionais para ~/Tools..."
 
 cd ~/Tools
 
+# ----------- Kerbrute -----------
+[ -s kerbrute ] || wget -q "https://github.com/ropnop/kerbrute/releases/download/v1.0.3/kerbrute_linux_amd64" -O kerbrute
+
 # ----------- LaZagne -----------
 [ -s LaZagne.exe ] || wget -q "https://github.com/AlessandroZ/LaZagne/releases/download/v2.4.7/LaZagne.exe" -O LaZagne.exe
 
