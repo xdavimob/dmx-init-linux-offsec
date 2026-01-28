@@ -237,6 +237,8 @@ source "$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin:$HOME/.cargo/bin
 source "$HOME/.cargo/env"
+export PATH=$PATH:$PATH/bin:$HOME/Tools
+export PATH=$PATH:$PATH/bin:$HOME/bin/impacket
 
 # Aliases úteis
 alias enum4linux-ng='~/Tools/enum4linux-ng/venv/bin/python ~/Tools/enum4linux-ng/enum4linux-ng.py'
@@ -250,6 +252,7 @@ alias prop="adb shell getprop ro.product.cpu.abi"
 alias root="adb root"
 alias unroot="adb unroot"
 alias fridaps="frida-ps -U -a"
+alias responder="sudo -E env PATH=\"\$PATH\" responder"alias impacket-ntlmrelayx='sudo -E env PATH="$PATH" impacket-ntlmrelayx'
 #alias server="adb shell /data/local/tmp/frida-server &"
 
 # Funções
