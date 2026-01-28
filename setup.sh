@@ -252,7 +252,8 @@ alias prop="adb shell getprop ro.product.cpu.abi"
 alias root="adb root"
 alias unroot="adb unroot"
 alias fridaps="frida-ps -U -a"
-alias responder="sudo -E env PATH=\"\$PATH\" responder"alias impacket-ntlmrelayx='sudo -E env PATH="$PATH" impacket-ntlmrelayx'
+alias responder="sudo -E env PATH=\"\$PATH\" responder"
+alias impacket-ntlmrelayx='sudo -E env PATH="$PATH" impacket-ntlmrelayx'
 #alias server="adb shell /data/local/tmp/frida-server &"
 
 # Funções
